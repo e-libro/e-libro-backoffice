@@ -70,5 +70,5 @@ jobs:
             fi
 
             docker pull ghcr.io/e-libro/e-libro-backoffice:latest
-            docker run -d --name e-libro-backoffice --env VITE_API_URL=$VITE_API_URL -p 8082:80 ghcr.io/e-libro/e-libro-backoffice:latest
+            docker run -d --name e-libro-backoffice --env VITE_API_URL=$VITE_API_URL -p 10.116.0.3:8082:80 ghcr.io/e-libro/e-libro-backoffice:latest
           EOF
