@@ -12,6 +12,10 @@ RUN npm run build
 
 FROM nginx:alpine
 
+# Copiar archivo de configuración personalizado de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiar la aplicación compilada al directorio raíz de Nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
