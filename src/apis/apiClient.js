@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8083/v1";
-// const API_URL = "http://api.e-libro.app:8083/v1/";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const ACCESS_TOKEN_KEY = "my-jwt-access-token";
 
