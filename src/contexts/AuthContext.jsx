@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import apiClient, { ACCESS_TOKEN_KEY } from "../apis/ApiClient";
+import apiClient, { ACCESS_TOKEN_KEY } from "../apis/apiClient";
 
 const AuthContext = createContext({});
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-import apiClient from "../../apis/ApiClient";
+import apiClient from "../../apis/apiClient";
 
 const DeleteUserModal = ({ show, onHide, userId, onDeleteSuccess }) => {
   const handleDelete = async () => {

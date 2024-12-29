@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Table, Button, Container, Pagination, Spinner } from "react-bootstrap";
 import DeleteUserModal from "../DeleteUserModal/DeleteUserModal";
-import apiClient from "../../apis/ApiClient";
+import apiClient from "../../apis/apiClient";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
