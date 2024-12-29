@@ -36,7 +36,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/e-libro/backoffice-react:latest
+          tags: ghcr.io/e-libro/e-libro-backoffice-:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -61,14 +61,14 @@ jobs:
           ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << EOF
             echo ${{ secrets.GH_TOKEN }} | docker login ghcr.io -u e-libro --password-stdin
             
-            if docker ps -a --filter "name=backoffice-react" --format '{{.Names}}' | grep -w backoffice-react; then
-              docker rm -f backoffice-react
+            if docker ps -a --filter "name=e-libro-backoffice" --format '{{.Names}}' | grep -w e-libro-backoffice; then
+              docker rm -f e-libro-backoffice
             fi
 
-            if docker images -q ghcr.io/e-libro/backoffice-react:latest; then
-              docker rmi -f ghcr.io/e-libro/backoffice-react:latest
+            if docker images -q ghcr.io/e-libro/e-libro-backoffice:latest; then
+              docker rmi -f ghcr.io/e-libro/e-libro-backoffice:latest
             fi
 
-            docker pull ghcr.io/e-libro/backoffice-react:latest
-            docker run -d --name backoffice-react --env VITE_API_URL=$VITE_API_URL -p 8082:80 ghcr.io/e-libro/backoffice-react:latest
+            docker pull ghcr.io/e-libro/e-libro-backoffice:latest
+            docker run -d --name e-libro-backoffice --env VITE_API_URL=$VITE_API_URL -p 8082:80 ghcr.io/e-libro/e-libro-backoffice:latest
           EOF
