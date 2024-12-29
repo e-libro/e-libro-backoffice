@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 
-ENV VITE_API_URL=/api/v1
+ENV VITE_API_URL=https://api.e-libro.app/v1
 
 RUN npm run build
 
