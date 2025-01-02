@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Form, Button, Container, Row, Col, Badge } from "react-bootstrap";
-import { useAuth } from "../../contexts/AuthContext";
+import authApi from "../../apis/authApi";
 
 const Profile = () => {
-  const { authState } = useAuth(); // Accede a los datos del usuario desde el contexto
-  const user = authState.user;
+  const [user, setUser] = useState(null); // Estado para almacenar los datos del usuario
+  const [loading, setLoading] = useState(true); // Estado para manejar la carga
+  const [error, setError] = useState(""); // Estado para manejar errores
 
-  // Estado para manejar el formulario de cambio de contraseña
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -14,6 +14,22 @@ const Profile = () => {
   });
 
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await authApi.me(); // Llamada a la API
+        setUser(userData); // Guardar el usuario en el estado
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load user data. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,34 +39,36 @@ const Profile = () => {
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (passwords.newPassword !== passwords.confirmPassword) {
-      setMessage("La nueva contraseña y la confirmación no coinciden.");
+      setMessage("The new password and confirmation do not match.");
       return;
     }
 
     try {
-      // Aquí deberías llamar a un endpoint de tu API para cambiar la contraseña
-      // await apiClient.post('/auth/change-password', {
-      //   currentPassword: passwords.currentPassword,
-      //   newPassword: passwords.newPassword,
-      // });
-
-      setMessage("Contraseña actualizada con éxito.");
+      // Aquí deberías llamar a tu API para cambiar la contraseña
+      setMessage("Password updated successfully.");
       setPasswords({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
     } catch (error) {
-      console.error("Error al cambiar la contraseña:", error);
-      setMessage("Hubo un error al cambiar la contraseña. Inténtalo nuevamente.");
+      console.error("Error changing password:", error);
+      setMessage("Failed to update the password. Please try again.");
     }
   };
+
+  if (loading) {
+    return <p>Loading user data...</p>;
+  }
+
+  if (error) {
+    return <p className="text-danger">{error}</p>;
+  }
 
   return (
     <Container className="my-5">
       <Row className="justify-content-center">
         <Col md={8}>
-          {/* Tarjeta de Datos del Usuario */}
           <Card className="shadow-lg mb-4 border-0">
             <Card.Body>
               <div className="d-flex align-items-center">
@@ -63,13 +81,13 @@ const Profile = () => {
                     marginRight: "20px",
                   }}
                 >
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                  {user?.fullname?.charAt(0).toUpperCase() || "U"}
                 </div>
                 <div>
-                  <h4 className="mb-0">{user?.name || "Usuario"}</h4>
-                  <p className="text-muted mb-0">{user?.email || "No disponible"}</p>
+                  <h4 className="mb-0">{user?.fullname || "User"}</h4>
+                  <p className="text-muted mb-0">{user?.email || "Not available"}</p>
                   <Badge bg="info" className="mt-2">
-                    {user?.role || "No asignado"}
+                    {user?.role || "Not assigned"}
                   </Badge>
                 </div>
               </div>
@@ -77,25 +95,24 @@ const Profile = () => {
               <Row>
                 <Col>
                   <p>
-                    <strong>ID:</strong> {user?.id || "No disponible"}
+                    <strong>ID:</strong> {user?.id || "Not available"}
                   </p>
                   <p>
-                    <strong>Fecha de creación:</strong>{" "}
-                    {new Date(user?.createdAt).toLocaleDateString("es-ES") || "No disponible"}
+                    <strong>Created At:</strong>{" "}
+                    {new Date(user?.createdAt).toLocaleDateString("en-US") || "Not available"}
                   </p>
                 </Col>
               </Row>
             </Card.Body>
           </Card>
 
-          {/* Formulario de Cambio de Contraseña */}
           <Card className="shadow-lg border-0">
             <Card.Body>
-              <h4 className="mb-3">Cambiar Contraseña</h4>
+              <h4 className="mb-3">Change Password</h4>
               {message && <p className="text-center text-danger">{message}</p>}
               <Form onSubmit={handleChangePassword}>
                 <Form.Group controlId="currentPassword" className="mb-3">
-                  <Form.Label>Contraseña Actual</Form.Label>
+                  <Form.Label>Current Password</Form.Label>
                   <Form.Control
                     type="password"
                     name="currentPassword"
@@ -106,7 +123,7 @@ const Profile = () => {
                 </Form.Group>
 
                 <Form.Group controlId="newPassword" className="mb-3">
-                  <Form.Label>Nueva Contraseña</Form.Label>
+                  <Form.Label>New Password</Form.Label>
                   <Form.Control
                     type="password"
                     name="newPassword"
@@ -117,7 +134,7 @@ const Profile = () => {
                 </Form.Group>
 
                 <Form.Group controlId="confirmPassword" className="mb-3">
-                  <Form.Label>Confirmar Nueva Contraseña</Form.Label>
+                  <Form.Label>Confirm New Password</Form.Label>
                   <Form.Control
                     type="password"
                     name="confirmPassword"
@@ -128,7 +145,7 @@ const Profile = () => {
                 </Form.Group>
 
                 <Button type="submit" variant="primary" className="w-100">
-                  Cambiar Contraseña
+                  Change Password
                 </Button>
               </Form>
             </Card.Body>
@@ -140,6 +157,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-
-

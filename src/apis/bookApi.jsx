@@ -17,3 +17,12 @@ export const getBookById = async (id) => {
     throw e.response?.data || e.message;
   }
 };
+
+export const incrementDownloads = async (id) => {
+  try {
+    const response = await apiClient.patch(`/books/${id}/downloads`);
+    return response.data;
+  } catch (e) {
+    throw e.response?.data || e.message;
+  }
+}

@@ -16,9 +16,7 @@ const App = () => (
             <ProtectedRoute>
               <AuthenticatedApp /> 
             </ProtectedRoute> 
-            
           }/>
-          
 
         <Route path="*" element={<NoMatch />} />
       </Routes>

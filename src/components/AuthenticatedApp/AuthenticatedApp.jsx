@@ -8,6 +8,7 @@ import DashboardLayout from "../../layouts/DashboardLayout/DashboardLayout";
 import Overview from "../../pages/Overview/Overview";
 import Profile from "../../pages/Profile/Profile";
 import Settings from "../../pages/Settings/Settings";
+import NoMatch from "../../pages/NoMatch/NoMatch";
 import UserManagement from "../../components/UserManagement/UserManagement";
 
 const AuthenticatedApp = () => {
@@ -29,6 +30,8 @@ const AuthenticatedApp = () => {
                 <Route path="user-management" element={<UserManagement />} />
               </Route>
             </Route>
+
+            <Route path="*" element={<NoMatch />} />
           </Routes>
         </div>
       </div>

@@ -11,7 +11,8 @@ import {
   FaUserCircle,
   FaCogs,
   FaSignOutAlt,
-  FaUsers
+  FaUsers,
+  FaBook
 } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -36,7 +37,7 @@ function Sidebar() {
         <ListGroup.Item action as={Link} to="/">
           <FaHome className="me-2" /> Inicio
         </ListGroup.Item>
-        <ListGroup.Item action as={Link} to="/about">
+        <ListGroup.Item action as={Link} to="/protected/about">
           <FaInfoCircle className="me-2" /> Acerca de
         </ListGroup.Item>
         <ListGroup.Item action onClick={toggleDashboardMenu}>
@@ -46,10 +47,10 @@ function Sidebar() {
         <Collapse in={dashboardOpen}>
           <div>
             <ListGroup variant="flush" className="ms-3">
-              <ListGroup.Item action as={Link} to="/dashboard/overview">
+              <ListGroup.Item action as={Link} to="/protected/dashboard/overview">
                 <FaChartPie className="me-2" /> Libros
               </ListGroup.Item>
-              <ListGroup.Item action as={Link} to="/dashboard/overview">
+              <ListGroup.Item action as={Link} to="/protected/dashboard/overview">
                 <FaChartPie className="me-2" /> Usuarios
               </ListGroup.Item>
               {/* <ListGroup.Item action as={Link} to="/dashboard/profile">
@@ -61,8 +62,11 @@ function Sidebar() {
             </ListGroup>
           </div>
         </Collapse>
-        <ListGroup.Item action as={Link} to="/dashboard/user-management">
+        <ListGroup.Item action as={Link} to="/protected/dashboard/user-management">
           <FaUsers className="me-2" /> Gestión de usuarios
+        </ListGroup.Item>
+        <ListGroup.Item action as={Link} to="/protected/dashboard/book-management">
+          <FaBook className="me-2" /> Gestión de libros
         </ListGroup.Item>
         {/* Línea separadora */}
         

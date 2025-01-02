@@ -35,3 +35,12 @@ export const deleteUser = async (id) => {
     throw e.response?.data || e.message;
   }
 };
+
+export const createUser = async (data) => {
+  try {
+    const response = await apiClient.post("/users", data);
+    return response.data;
+  } catch (e) {
+    throw e.response?.data || e.message;
+  }
+};

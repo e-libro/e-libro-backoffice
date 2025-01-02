@@ -1,20 +1,35 @@
-import apiClient from "./ApiClient";
+import apiClient from "./apiClient.jsx";
 
-export const signin = async (email, password) => {
-  try {
-    const response = await apiClient.post("/auth/signin", { email, password });
-    return response.data;
-  } catch (e) {
-    throw e.response?.data || e.message;
-  }
-};
 
-export const signout = async () => {
-  try {
-    await apiClient.post("/auth/signout", {}, { withCredentials: true });
-  } catch (e) {
-    throw e.response?.data || e.message;
-  } finally {
-    localStorage.removeItem("my-jwt-access-token");
+class AuthApi {
+   async signin(email, password) {
+    try {
+      const response = await apiClient.post("/auth/signin", { email, password });
+      return response.data;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
   }
-};
+
+   async signout() {
+    try {
+      await apiClient.get("/auth/signout", {}, { withCredentials: true });
+    } catch (e) {
+      throw e.response?.data || e.message;
+    } finally {
+      localStorage.removeItem("my-jwt-access-token");
+    }
+  }
+
+   async me() {
+    try {
+      const response = await apiClient.post("/auth/me", {}, { withCredentials: true });
+      return response.data;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
+  }
+}
+
+
+export default new AuthApi();

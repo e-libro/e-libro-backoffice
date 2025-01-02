@@ -1,24 +1,14 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { Spinner } from "react-bootstrap";
-import AuthenticatedApp from "../AuthenticatedApp/AuthenticatedApp";
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({children}) => {
   const { authState } = useAuth();
-
-  if (authState.loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
-        <Spinner animation="border" variant="primary" />
-        <p className="mt-3">Cargando...</p>
-      </div>
-    );
+  //
+{console.log(authState.authenticated)}
+  if (!authState.authenticated)  {
+    return <Navigate to="/" />;
   }
-  {
-    console.log(authState.user);
-  }
-
-  return authState.authenticated ? <AuthenticatedApp /> : <Navigate to="/" />;
-};
+  return children;
+}
 
 export default ProtectedRoute;

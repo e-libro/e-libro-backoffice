@@ -1,5 +1,4 @@
 import { Outlet } from "react-router-dom";
-import { Card } from "react-bootstrap";
 
 const DashboardLayout = () => {
   return (

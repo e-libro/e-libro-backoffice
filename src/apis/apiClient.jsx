@@ -12,6 +12,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+    
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -28,15 +29,17 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
+
         const refreshResponse = await apiClient.post(
           "/auth/refresh",
           {},
           { withCredentials: true }
         );
-        const { accessToken } = refreshResponse.data;
+        
+        const accessToken  = refreshResponse.data.data.accessToken;
 
         localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-
+     
         originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (e) {

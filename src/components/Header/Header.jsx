@@ -7,7 +7,7 @@ import { useAuth } from "../../contexts/AuthContext";
 const Header = () => {
   const {authState, signout } = useAuth();
   const navigate = useNavigate();
-  const userName = authState.user.fullname || "User Name}";
+  const userName = authState?.user?.fullname || "User Name";
 
   const handleSignout = async () => {
     try {
@@ -98,7 +98,7 @@ const Header = () => {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/dashboard/profile">
+                <Dropdown.Item as={Link} to="/protected/dashboard/profile">
                   <FaUser className="me-2" />
                   Perfil
                 </Dropdown.Item>
