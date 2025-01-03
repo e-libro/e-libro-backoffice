@@ -11,6 +11,7 @@ import LanguagesDistributionReport from "../LanguagesDistributionReport/Language
 import TopBooksChart from "../TopBooksChart/TopBooksChart";
 import MonthlyUserSignupsReport from "../MonthlyUserSignupsReport/MonthlyUserSignupsReport";
 import DualReportsContainer from "../DualReportsContainer/DualReportsContainer";
+import Profile from "../../pages/Profile/Profile";
 
 const AuthenticatedApp = () => {
   return (
@@ -25,6 +26,7 @@ const AuthenticatedApp = () => {
               <Route path="about" element={<About />} />
               <Route path="dashboard" element={<DashboardLayout />}>
                 <Route index element={<About />} />
+                <Route path="profile" element={<Profile />} />
                 <Route path="books-reports" element={<DualReportsContainer 
                                                         title="Reportes de libros"
                                                         leftComponent={<LanguagesDistributionReport />} 
