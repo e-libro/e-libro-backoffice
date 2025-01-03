@@ -98,7 +98,7 @@ const Header = () => {
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/protected/dashboard/profile">
+                <Dropdown.Item as={Link} to="/dashboard/profile">
                   <FaUser className="me-2" />
                   Perfil
                 </Dropdown.Item>

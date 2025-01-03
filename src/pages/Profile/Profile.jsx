@@ -13,13 +13,14 @@ const Profile = () => {
     confirmPassword: "",
   });
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(""); // Mensaje general
+  const [errorDetails, setErrorDetails] = useState([]); // Detalles específicos del error
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const userData = await authApi.me(); // Llamada a la API
-        setUser(userData); // Guardar el usuario en el estado
+        const response = await authApi.me();
+        setUser(response.data);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching user data:", err);
@@ -44,16 +45,42 @@ const Profile = () => {
     }
 
     try {
-      // Aquí deberías llamar a tu API para cambiar la contraseña
-      setMessage("Password updated successfully.");
+      const response = await authApi.changePassword(
+        passwords.currentPassword,
+        passwords.newPassword
+      );
+
+      if (response.status === "success") {
+        setMessage("Password updated successfully.");
+        setErrorDetails([]);
+        setPasswords({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else if (response.status === "error") {
+        setMessage(response.message || "Failed to update the password.");
+        setErrorDetails(Array.isArray(response.error?.details) ? response.error.details : []);
+        setPasswords({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (error) {
+      if (error.response?.status === 401 || error.response?.status === 400) {
+        const response = error.response.data;
+        setMessage(response.message || "Authentication failed.");
+        setErrorDetails(Array.isArray(response.error?.details) ? response.error.details : []);
+      } else {
+        setMessage("Failed to update the password. Please try again.");
+        setErrorDetails([]);
+      }
       setPasswords({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-    } catch (error) {
-      console.error("Error changing password:", error);
-      setMessage("Failed to update the password. Please try again.");
     }
   };
 
@@ -109,7 +136,20 @@ const Profile = () => {
           <Card className="shadow-lg border-0">
             <Card.Body>
               <h4 className="mb-3">Change Password</h4>
-              {message && <p className="text-center text-danger">{message}</p>}
+              {message && (
+                <div className="text-center">
+                  <p className={`text-${errorDetails.length > 0 ? "danger" : "success"}`}>
+                    {message}
+                  </p>
+                  {errorDetails.length > 0 && (
+                    <ul className="text-danger">
+                      {errorDetails.map((detail, index) => (
+                        <li key={index}>{detail}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
               <Form onSubmit={handleChangePassword}>
                 <Form.Group controlId="currentPassword" className="mb-3">
                   <Form.Label>Current Password</Form.Label>

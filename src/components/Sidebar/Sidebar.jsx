@@ -34,38 +34,34 @@ function Sidebar() {
   return (
     <div className="bg-light position-fixed h-100 overflow-auto shadow" style={{ width: "200px", top: "56px" }}>
       <ListGroup variant="flush" className="pt-2">
-        <ListGroup.Item action as={Link} to="/">
+        {/* <ListGroup.Item action as={Link} to="/">
           <FaHome className="me-2" /> Inicio
-        </ListGroup.Item>
-        <ListGroup.Item action as={Link} to="/protected/about">
+        </ListGroup.Item> */}
+
+        <ListGroup.Item action as={Link} to="/about">
           <FaInfoCircle className="me-2" /> Acerca de
-        </ListGroup.Item>
+        </ListGroup.Item> 
+        
         <ListGroup.Item action onClick={toggleDashboardMenu}>
-          <FaTachometerAlt className="me-2" /> Dashboard
+          <FaTachometerAlt className="me-2" /> Reportes
           <FaChevronDown className="ms-auto" style={{ transition: "transform 0.3s", transform: dashboardOpen ? "rotate(180deg)" : "rotate(0deg)" }} />
         </ListGroup.Item>
         <Collapse in={dashboardOpen}>
           <div>
             <ListGroup variant="flush" className="ms-3">
-              <ListGroup.Item action as={Link} to="/protected/dashboard/overview">
+              <ListGroup.Item action as={Link} to="/dashboard/books-reports">
                 <FaChartPie className="me-2" /> Libros
               </ListGroup.Item>
-              <ListGroup.Item action as={Link} to="/protected/dashboard/overview">
+              <ListGroup.Item action as={Link} to="/dashboard/users-reports">
                 <FaChartPie className="me-2" /> Usuarios
               </ListGroup.Item>
-              {/* <ListGroup.Item action as={Link} to="/dashboard/profile">
-                <FaUserCircle className="me-2" /> Perfil
-              </ListGroup.Item>
-              <ListGroup.Item action as={Link} to="/dashboard/settings">
-                <FaCogs className="me-2" /> Configuración
-              </ListGroup.Item> */}
             </ListGroup>
           </div>
         </Collapse>
-        <ListGroup.Item action as={Link} to="/protected/dashboard/user-management">
+        <ListGroup.Item action as={Link} to="/dashboard/users-management">
           <FaUsers className="me-2" /> Gestión de usuarios
         </ListGroup.Item>
-        <ListGroup.Item action as={Link} to="/protected/dashboard/book-management">
+        <ListGroup.Item action as={Link} to="/dashboard/books-management">
           <FaBook className="me-2" /> Gestión de libros
         </ListGroup.Item>
         {/* Línea separadora */}

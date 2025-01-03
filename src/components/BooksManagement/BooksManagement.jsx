@@ -1,19 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button, Container, Pagination, Spinner, Image } from "react-bootstrap";
-import bookApi from "../../apis/bookApi";
+import apiClient from "../../apis/apiClient";
+import BookDetailsModal from "../BookDetailsModal/BookDetailsModal";
 
 // --------------------------------------------------------------------
 //  Lógica para generar las páginas a mostrar en la paginación
 // --------------------------------------------------------------------
 function getPageNumbers(totalPages) {
-  // Si tenemos pocas páginas, mostramos todas
   if (totalPages <= 10) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
-  // Primeras 5
   const startPages = [1, 2, 3, 4, 5];
-  // Últimas 5
   const endPages = [
     totalPages - 4,
     totalPages - 3,
@@ -22,59 +20,37 @@ function getPageNumbers(totalPages) {
     totalPages,
   ];
 
-  // Retornamos con placeholder
   return [...startPages, "...", ...endPages];
 }
 
-const BookManagement = () => {
-  // ESTADOS
+const BooksManagement = () => {
   const [books, setBooks] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  // Filtros de búsqueda
   const [filters, setFilters] = useState({
     title: "",
     author: "",
   });
 
-  /**
-   * fetchBooks
-   * Llama al endpoint /books con los parámetros actuales.
-   * Si no se pasa 'page', por defecto es 1.
-   */
   const fetchBooks = async (page = 1) => {
     setLoading(true);
     try {
-      // Petición al endpoint
-      const response = await bookApi.getAllBooks({
-        page,
-        limit: 5, // Ajusta si deseas otro número de resultados por página
-        title: filters.title,
-        author: filters.author,
+      const response = await apiClient.get(`/books`, {
+        params: { page, limit: 5, title: filters.title, author: filters.author },
       });
 
-      // Estructura de la respuesta según lo que nos compartiste:
-      // {
-      //   totalBooks,
-      //   totalPages,
-      //   page,
-      //   limit,
-      //   books,
-      //   language
-      // }
-      const { totalBooks, totalPages, page: currentPageAPI, limit, books, language } = response;
+      const { data } = response.data;
+      const { totalDocuments, totalPages, documents } = data;
 
-      // Actualizar estados
-      setBooks(books || []);
+      setBooks(documents || []);
       setTotalPages(totalPages || 1);
-      setCurrentPage(currentPageAPI || 1);
+      setCurrentPage(page);
 
-      // (Opcional) Consola para depuración
-      console.log("Language:", language);
-      console.log("Total libros:", totalBooks);
-      console.log("Límite actual:", limit);
+      console.log(`Total libros: ${totalDocuments}`);
     } catch (error) {
       console.error("Error fetching books:", error);
     } finally {
@@ -82,52 +58,38 @@ const BookManagement = () => {
     }
   };
 
-  /**
-   * handleSearch
-   * Se dispara cuando el usuario hace clic en el botón "Buscar".
-   * Reinicia la búsqueda en la página 1.
-   */
-  const handleSearch = () => {
-    fetchBooks(1);
-  };
+  useEffect(() => {
+    fetchBooks(currentPage);
+  }, [currentPage, filters]);
 
-  /**
-   * handlePageChange
-   * Cambia la página y vuelve a llamar a la API.
-   */
   const handlePageChange = (page) => {
-    // Si el usuario hace clic en "..." no hacemos nada
     if (page === "...") return;
-
     setCurrentPage(page);
     fetchBooks(page);
   };
 
-  /**
-   * handleFilterChange
-   * Actualiza el estado de filtros a medida que el usuario escribe en los campos.
-   */
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * handleClearFilters
-   * Limpia los filtros y permanece en la misma página (o decide si fetchBooks(1)).
-   */
   const handleClearFilters = () => {
     setFilters({ title: "", author: "" });
   };
 
-  // --------------------------------------------------------------------
-  //  Render
-  // --------------------------------------------------------------------
+  const handleDownload = (url) => {
+    window.open(url, "_blank");
+  };
+
+  const handleShowDetails = (book) => {
+    setSelectedBook(book);
+    setShowDetailsModal(true);
+  };
+
   return (
     <Container className="my-5">
       <h2 className="mb-4">Gestión de Libros</h2>
 
-      {/* Sección de filtros */}
       <div className="mb-4 d-flex align-items-center">
         <input
           type="text"
@@ -145,7 +107,7 @@ const BookManagement = () => {
           onChange={handleFilterChange}
           className="form-control w-auto me-2"
         />
-        <Button variant="primary" onClick={handleSearch} className="me-2">
+        <Button variant="primary" onClick={() => fetchBooks(1)} className="me-2">
           Buscar
         </Button>
         <Button variant="secondary" onClick={handleClearFilters}>
@@ -162,15 +124,12 @@ const BookManagement = () => {
         </div>
       ) : (
         <>
-          {/* Tabla de Libros */}
           <Table striped bordered hover responsive>
             <thead className="table-dark">
               <tr>
-                <th>ID</th>
-                <th>Portada</th>
+                <th className="text-center">Portada</th>
                 <th>Título</th>
                 <th>Autores</th>
-                <th>Descargas</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -183,9 +142,8 @@ const BookManagement = () => {
 
                   return (
                     <tr key={book.id}>
-                      <td>{book.id}</td>
-                      <td>
-                        {book.cover && book.cover.url ? (
+                      <td className="text-center">
+                        {book.cover?.url ? (
                           <Image
                             src={book.cover.url}
                             alt={book.title}
@@ -198,13 +156,21 @@ const BookManagement = () => {
                       </td>
                       <td>{book.title}</td>
                       <td>{authorsDisplay}</td>
-                      <td>{book.donwloads || 0}</td>
                       <td>
-                        <Button variant="info" size="sm" className="me-2">
-                          Editar
+                        <Button
+                          variant="success"
+                          size="sm"
+                          className="me-2"
+                          onClick={() => handleDownload(book.content.url)}
+                        >
+                          Descargar
                         </Button>
-                        <Button variant="danger" size="sm">
-                          Eliminar
+                        <Button
+                          variant="info"
+                          size="sm"
+                          onClick={() => handleShowDetails(book)}
+                        >
+                          Detalles
                         </Button>
                       </td>
                     </tr>
@@ -212,7 +178,7 @@ const BookManagement = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center">
+                  <td colSpan="4" className="text-center">
                     No se encontraron libros.
                   </td>
                 </tr>
@@ -220,7 +186,6 @@ const BookManagement = () => {
             </tbody>
           </Table>
 
-          {/* Paginación */}
           <Pagination className="justify-content-center">
             {getPageNumbers(totalPages).map((page, idx) => (
               <Pagination.Item
@@ -233,10 +198,16 @@ const BookManagement = () => {
               </Pagination.Item>
             ))}
           </Pagination>
+
+          <BookDetailsModal
+            show={showDetailsModal}
+            onClose={() => setShowDetailsModal(false)}
+            book={selectedBook}
+          />
         </>
       )}
     </Container>
   );
 };
 
-export default BookManagement;
+export default BooksManagement;

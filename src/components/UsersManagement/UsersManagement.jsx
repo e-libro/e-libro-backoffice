@@ -7,7 +7,27 @@ import UpdateUserModal from "../UpdateUserModal/UpdateUserModal"; // Importa el 
 import ChangePasswordModal from "../ChangePasswordModal/ChangePasswordModal"; // Importa el modal de cambiar contraseña
 import apiClient from "../../apis/apiClient";
 
-const UserManagement = () => {
+// --------------------------------------------------------------------
+//  Lógica para generar las páginas a mostrar en la paginación
+// --------------------------------------------------------------------
+function getPageNumbers(totalPages) {
+  if (totalPages <= 10) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const startPages = [1, 2, 3, 4, 5];
+  const endPages = [
+    totalPages - 4,
+    totalPages - 3,
+    totalPages - 2,
+    totalPages - 1,
+    totalPages,
+  ];
+
+  return [...startPages, "...", ...endPages];
+}
+
+const UsersManagement = () => {
   const [users, setUsers] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,11 +43,14 @@ const UserManagement = () => {
   const fetchUsers = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`/users?page=${page}`);
-      const { users, totalPages } = response.data;
+      const response = await apiClient.get(`/users`, {
+        params: { page, limit: 5, role: "admin" }, 
+      });
+      const { data } = response.data;
+      const { totalPages, documents } = data;
 
-      setUsers(users);
-      setTotalPages(totalPages);
+      setUsers(documents || []);
+      setTotalPages(totalPages || 1);
       setCurrentPage(page);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -41,7 +64,9 @@ const UserManagement = () => {
   }, [currentPage]);
 
   const handlePageChange = (page) => {
+    if (page === "...") return;
     setCurrentPage(page);
+    fetchUsers(page);
   };
 
   const handleOpenDeleteModal = (userId) => {
@@ -107,8 +132,7 @@ const UserManagement = () => {
           <Table striped bordered hover responsive>
             <thead className="table-dark">
               <tr>
-                <th>ID</th>
-                <th>Nombre</th>
+                                <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
                 <th>Fecha de Creación</th>
@@ -119,8 +143,7 @@ const UserManagement = () => {
               {users.length > 0 ? (
                 users.map((user) => (
                   <tr key={user.id}>
-                    <td>{user.id}</td>
-                    <td>
+                                        <td>
                       <Button
                         variant="link"
                         className="p-0 text-decoration-none"
@@ -171,13 +194,14 @@ const UserManagement = () => {
 
           {/* Paginación */}
           <Pagination className="justify-content-center">
-            {Array.from({ length: totalPages }, (_, i) => (
+            {getPageNumbers(totalPages).map((page, idx) => (
               <Pagination.Item
-                key={i + 1}
-                active={i + 1 === currentPage}
-                onClick={() => handlePageChange(i + 1)}
+                key={idx}
+                active={page === currentPage}
+                onClick={() => handlePageChange(page)}
+                disabled={page === "..."}
               >
-                {i + 1}
+                {page}
               </Pagination.Item>
             ))}
           </Pagination>
@@ -224,4 +248,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default UsersManagement;

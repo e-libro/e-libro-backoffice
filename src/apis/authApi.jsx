@@ -29,6 +29,17 @@ class AuthApi {
       throw e.response?.data || e.message;
     }
   }
+
+  async changePassword(currentPassword, newPassword) {
+    console.log({currentPassword, newPassword})
+    try {
+      const response = await apiClient.patch("/auth/change-password", {currentPassword, newPassword}, { withCredentials: true });
+      return response.data;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
+  }
+
 }
 
 
