@@ -20,7 +20,7 @@ const schema = yup.object().shape({
     .required('Debe confirmar la nueva contraseña'),
 });
 
-const ChangePasswordModal = ({ show, onClose }) => {
+const ChangePasswordModal = ({ show, onClose,  }) => {
   const {
     register,
     handleSubmit,

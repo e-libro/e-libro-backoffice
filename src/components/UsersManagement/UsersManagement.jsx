@@ -5,8 +5,7 @@ import UserDetailsModal from "../UserDetailsModal/UserDetailsModal"; // Importa 
 import AddUserModal from "../AddUserModal/AddUserModal"; // Importa el modal de agregar usuario
 import UpdateUserModal from "../UpdateUserModal/UpdateUserModal"; // Importa el modal de actualizar usuario
 import ChangePasswordModal from "../ChangePasswordModal/ChangePasswordModal"; // Importa el modal de cambiar contraseña
-import apiClient from "../../apis/apiClient";
-
+import userApi from "../../apis/userApi";
 // --------------------------------------------------------------------
 //  Lógica para generar las páginas a mostrar en la paginación
 // --------------------------------------------------------------------
@@ -43,11 +42,8 @@ const UsersManagement = () => {
   const fetchUsers = async (page = 1) => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`/users`, {
-        params: { page, limit: 5, role: "admin" }, 
-      });
-      const { data } = response.data;
-      const { totalPages, documents } = data;
+      const response = await userApi.getAllUsers({params: { page, limit: 5, role: "admin" }});
+      const { totalPages, documents } = response.data;
 
       setUsers(documents || []);
       setTotalPages(totalPages || 1);
@@ -61,7 +57,7 @@ const UsersManagement = () => {
 
   useEffect(() => {
     fetchUsers(currentPage);
-  }, [currentPage]);
+  }, [currentPage, showDeleteModal, showUpdateUserModal]);
 
   const handlePageChange = (page) => {
     if (page === "...") return;
@@ -93,10 +89,8 @@ const UsersManagement = () => {
     setShowChangePasswordModal(true);
   };
 
-  const handleChangePassword = async (password) => {
+  const handleChangePassword = async (currentPassword, newPassword) => {
     try {
-      await apiClient.post(`/users/${selectedUserId}/reset-password`, { password });
-      alert("Contraseña actualizada exitosamente");
       setShowChangePasswordModal(false);
     } catch (error) {
       console.error("Error al cambiar la contraseña:", error);
@@ -104,15 +98,39 @@ const UsersManagement = () => {
     }
   };
 
-  const handleAddUser = (newUser) => {
-    setUsers((prevUsers) => [newUser, ...prevUsers]); // Agrega el nuevo usuario al inicio de la lista
+  const handleAddUser = async (newUser) => {
+    try {
+      
+      // Llama a la API para agregar un nuevo usuario
+      const response = await userApi.createUser(newUser);
+      const createdUser = response.data;
+  
+      // Actualiza el estado con el nuevo usuario
+      setUsers((prevUsers) => [createdUser, ...prevUsers]);
+      alert("Usuario agregado exitosamente");
+    } catch (error) {
+      console.error("Error al agregar usuario:", error);
+      alert("No se pudo agregar el usuario. Por favor, inténtelo de nuevo.");
+    }
   };
-
-  const handleUpdateUser = (updatedUser) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-    );
+  
+  const handleUpdateUser = async (updatedUser) => {
+    try {
+      // Llama a la API para actualizar el usuario
+      const response = await userApi.updateUser(updatedUser.id, updatedUser);
+      const updatedData = response.data;
+  
+      // Actualiza el estado con los datos actualizados
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === updatedData.id ? updatedData : user))
+      );
+      alert("Usuario actualizado exitosamente");
+    } catch (error) {
+      console.error("Error al actualizar usuario:", error);
+      alert("No se pudo actualizar el usuario. Por favor, inténtelo de nuevo.");
+    }
   };
+  
 
   return (
     <Container className="my-5">

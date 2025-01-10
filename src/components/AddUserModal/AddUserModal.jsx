@@ -3,7 +3,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { createUser } from '../../apis/userApi'; // Importar la función de la API
+
 
 const schema = yup.object().shape({
   fullname: yup.string().min(4, 'El nombre completo debe tener al menos 4 caracteres').required('El nombre completo es obligatorio'),
@@ -24,8 +24,7 @@ const AddUserModal = ({ show, onClose, onSave }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await createUser(data); // Llama a la API para crear un usuario
-      onSave(response.data); // Pasa el usuario creado al callback onSave
+      onSave(data); // Pasa el usuario creado al callback onSave
       reset();
       onClose();
     } catch (error) {

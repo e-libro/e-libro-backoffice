@@ -1,11 +1,11 @@
 import React from "react";
 import { Modal, Button } from "react-bootstrap";
-import apiClient from "../../apis/apiClient";
+import userApi from "../../apis/userApi";
 
 const DeleteUserModal = ({ show, onHide, userId, onDeleteSuccess }) => {
   const handleDelete = async () => {
     try {
-      await apiClient.delete(`/users/${userId}`);
+      await userApi.deleteUser(userId);
       onDeleteSuccess(userId); // Notifica al componente padre sobre la eliminación
       onHide(); // Cierra el modal
     } catch (error) {
