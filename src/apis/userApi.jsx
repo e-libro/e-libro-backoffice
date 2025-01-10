@@ -1,6 +1,7 @@
 import apiClient from "./apiClient";
 
-export const getAllUsers = async () => {
+class UserApi {
+  async getAllUsers() {
   try {
     const response = await apiClient.get("/users");
     return response.data;
@@ -9,7 +10,7 @@ export const getAllUsers = async () => {
   }
 };
 
-export const getUserById = async (id) => {
+async getUserById(id) {
   try {
     const response = await apiClient.get(`/users/${id}`);
     return response.data;
@@ -18,7 +19,7 @@ export const getUserById = async (id) => {
   }
 };
 
-export const updateUser = async (id, updates) => {
+async updateUser(id, updates) {
   try {
     const response = await apiClient.put(`/users/${id}`, updates);
     return response.data;
@@ -27,7 +28,7 @@ export const updateUser = async (id, updates) => {
   }
 };
 
-export const deleteUser = async (id) => {
+async deleteUser(id) {
   try {
     const response = await apiClient.delete(`/users/${id}`);
     return response.data;
@@ -36,7 +37,7 @@ export const deleteUser = async (id) => {
   }
 };
 
-export const createUser = async (data) => {
+async createUser(data) {
   try {
     const response = await apiClient.post("/users", data);
     return response.data;
@@ -44,3 +45,6 @@ export const createUser = async (data) => {
     throw e.response?.data || e.message;
   }
 };
+}
+
+export default new UserApi();
